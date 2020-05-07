@@ -1,3 +1,7 @@
+""" 
+    Converts integers to common size units used in computing 
+    https://stackoverflow.com/questions/5194057/better-way-to-convert-file-sizes-in-python
+"""
 import math
 
 def convert_size(size_bytes:int=0) -> str:
@@ -10,10 +14,6 @@ def convert_size(size_bytes:int=0) -> str:
    return "%s %s" % (s, size_name[i])
 
 def bytes_transform(size_bytes, unit:str=None) -> float:
-    """ 
-        Converts integers to common size units used in computing 
-        https://stackoverflow.com/questions/5194057/better-way-to-convert-file-sizes-in-python
-    """
     if unit == None:
         unit = "MB"
     bit_shift = {
