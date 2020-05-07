@@ -1,6 +1,6 @@
 import math
 
-def convert_size(size_bytes):
+def convert_size(size_bytes:int=0) -> str:
    if size_bytes == 0:
        return "0B"
    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
@@ -9,7 +9,7 @@ def convert_size(size_bytes):
    s = round(size_bytes / p, 2)
    return "%s %s" % (s, size_name[i])
 
-def bytes_transform(size_bytes, unit:str=None):
+def bytes_transform(size_bytes, unit:str=None) -> float:
     """ 
         Converts integers to common size units used in computing 
         https://stackoverflow.com/questions/5194057/better-way-to-convert-file-sizes-in-python

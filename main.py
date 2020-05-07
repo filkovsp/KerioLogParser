@@ -15,10 +15,11 @@ if (__name__ == "__main__"):
             keys, values = Connection.parse(line)
             df = df.append(pd.DataFrame(data=[values], columns=keys), ignore_index =True)
     
+    # --- Ret DataFrame.index to the unique "ID" field:
     df.set_index("ID", inplace=True)
-    # sns.barplot(x = "sex", y = "survived", data=titanic)
-    # sns.barplot(x="User", y="Bytes.Total", data=df, orient="v")
-    # plt.show()
+    # --- Replace noname user name with "NaN" value:
+    df["User"] = df["User"].mask(df["User"] == "", "NaN")
+
     
     print(df.head())
     print(df.tail())
