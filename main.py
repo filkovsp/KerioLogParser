@@ -16,10 +16,12 @@ if (__name__ == "__main__"):
             keys, values = Connection.parse(line)
             df = df.append(pd.DataFrame(data=[values], columns=keys), ignore_index =True)
     
-    # --- Ret DataFrame.index to the unique "ID" field:
+    # --- Set DataFrame.index to the unique "ID" field:
     df.set_index("ID", inplace=True)
     # --- Replace noname user name with "NaN" value:
-    df["User"] = df["User"].mask(df["User"] == "", "NaN")
+    df["User"].mask(df["User"] == "", "NaN", inplace=True)
+    # --- Replace empty DestinationHostName with their DestinationIp
+    df["Connection.DestinationHostName"].mask(df["Connection.DestinationHostName"] == "", df["Connection.DestinationIp"], inplace=True)
 
     
     print(df.head())
