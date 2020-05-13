@@ -78,8 +78,8 @@ class Connection(object):
         #     "protocol" : r'\A(\w*?)\s',
         #     "src_host" : r'\A\w*?\s(.*?)\s',
         # }
-        keys = ["Connection.Protocol", 
-                "Connection.SourceHostName", "Connection.SourceIp","Connection.SourcePort",
-                "Connection.DestinationHostName", "Connection.DestinationIp", "Connection.DestinationPort"]
+        keys = ["Protocol", 
+                "SourceHost", "SourceIp", "SourcePort",
+                "DestinationHost", "DestinationIp", "DestinationPort"]
         values = re.findall(r'\A(\w*?)\s(\S*?)?\s?\(?((?:[0-9]{1,3}\.){3}[0-9]{1,3})\)?:?(\d+)?\s\-\>\s(\S*?)?\s?\(?((?:[0-9]{1,3}\.){3}[0-9]{1,3})\)?:?(\d+)?$', s)[0]
         return (keys, values)
