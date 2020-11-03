@@ -8,6 +8,7 @@
 # from multipledispatch import dispatch
 from pythonlangutil.overload import Overload, signature
 import math
+import datetime as dt
 
 class BiteSize:
         
@@ -32,3 +33,19 @@ class BiteSize:
                 "GB": 30,   # GigaBytes
                 "TB": 40}   # TeraBytes
         return round(size_bytes / float(1 << bit_shift[unit]), 2)
+    
+class TimeUtil:
+    @classmethod
+    def getDTString(cls, t:dt.datetime=None) -> str:
+        if not t:
+            t = dt.datetime.now()
+        return t.strftime("%Y-%m-%d %H:%M:%S")
+
+    @classmethod
+    def getDuration(cls, t:dt.datetime=None) -> str:
+        duration = (dt.datetime.now() - t).total_seconds()
+        return "{0:02d}:{1:02d}:{2:02d}".format(
+            int(divmod(duration, 3600)[0]),   # hrs
+            int(divmod(duration, 60)[0]),     # mins
+            int(duration % 60)  
+        )
