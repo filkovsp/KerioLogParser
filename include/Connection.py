@@ -1,5 +1,6 @@
 import re
 import datetime as dt
+from typing import Tuple
 
 class Connection(object):
     """
@@ -36,11 +37,11 @@ class Connection(object):
             "Bytes" : r'\[Bytes\]\s(.+)\s\[Packets',
         
         # Packets: Transmitted/Accepted/Total
-            "Packets" : r'\[Packets\]\s(.+)[\n|$]' 
+            "Packets" : r'\[Packets\]\s(.+)$' 
         }
 
     @classmethod
-    def parse(cls, s:str) -> ():
+    def parse(cls, s:str) -> tuple:
         keys = []
         values = []
         for index, key in enumerate(list(cls.grammar.keys())):
@@ -68,18 +69,16 @@ class Connection(object):
                 for pindex, pkey in enumerate(["Packets.Transmitted", "Packets.Accepted", "Packets.Total"]):                    
                     keys.append(pkey)
                     values.append(int(value[0].split("/")[pindex]))
-
+        values = list(map(lambda x: x if x is not "" else None, values))
         return (keys, values)
     
     @classmethod
-    def parseConnectionInfo(cls, s:str) -> ():
+    def parseConnectionInfo(cls, s:str) -> tuple:
         # protocol src_host (src_ip):src_port -> dst_host (dst_ip):dst_port
         # connectionGrammar = {
         #     "protocol" : r'\A(\w*?)\s',
         #     "src_host" : r'\A\w*?\s(.*?)\s',
         # }
-        keys = ["Protocol", 
-                "SourceHost", "SourceIp", "SourcePort",
-                "DestinationHost", "DestinationIp", "DestinationPort"]
-        values = re.findall(r'\A(\w*?)\s(\S*?)?\s?\(?((?:[0-9]{1,3}\.){3}[0-9]{1,3})\)?:?(\d+)?\s\-\>\s(\S*?)?\s?\(?((?:[0-9]{1,3}\.){3}[0-9]{1,3})\)?:?(\d+)?$', s)[0]
+        keys = ["Protocol", "SourceHost", "SourceIp", "SourcePort", "DestinationHost", "DestinationIp", "DestinationPort"]
+        values = list(re.findall(r'\A(\w*?)\s(\S*?)?\s?\(?((?:[0-9]{1,3}\.){3}[0-9]{1,3})\)?:?(\d+)?\s\-\>\s(\S*?)?\s?\(?((?:[0-9]{1,3}\.){3}[0-9]{1,3})\)?:?(\d+)?$', s)[0])
         return (keys, values)
