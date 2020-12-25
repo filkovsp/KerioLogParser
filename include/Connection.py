@@ -74,11 +74,18 @@ class Connection(object):
     
     @classmethod
     def parseConnectionInfo(cls, s:str) -> tuple:
+        # TODO:
+        # adjust to older versions:
+        # Kerio v7.2: 
+        # protocol src_host:src_port -> dst_host:dst_port
+        #
+        # Kerio v7.4:
         # protocol src_host (src_ip):src_port -> dst_host (dst_ip):dst_port
         # connectionGrammar = {
         #     "protocol" : r'\A(\w*?)\s',
         #     "src_host" : r'\A\w*?\s(.*?)\s',
         # }
+        # v.7.4 + currently is only supported.
         keys = ["Protocol", "SourceHost", "SourceIp", "SourcePort", "DestinationHost", "DestinationIp", "DestinationPort"]
         values = list(re.findall(r'\A(\w*?)\s(\S*?)?\s?\(?((?:[0-9]{1,3}\.){3}[0-9]{1,3})\)?:?(\d+)?\s\-\>\s(\S*?)?\s?\(?((?:[0-9]{1,3}\.){3}[0-9]{1,3})\)?:?(\d+)?$', s)[0])
         return (keys, values)
