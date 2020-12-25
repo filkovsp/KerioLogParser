@@ -1,9 +1,14 @@
+"""
+    this file is supposed to be ran in VSCode supporting Jupyter code cells.
+    For more info visit:
+    https://code.visualstudio.com/docs/python/jupyter-support-py
+"""
+
 # %% --- main imports:
 from IPython import get_ipython
 get_ipython().run_line_magic('matplotlib', 'inline')
 import matplotlib.pyplot as plt
 
-# from include.Connection import Connection
 from include.Tools import *
 import pandas as pd
 import numpy as np
@@ -12,7 +17,6 @@ import os, re
 
 # %% --- PostgreSQL functionality support:
 import psycopg2
-# from psycopg2 import extras
 dsn = """
     host = 192.168.1.10
     dbname = kerio
@@ -25,9 +29,9 @@ conn.autocommit = True
 
 # %% --- get the data:
 # df = pd.DataFrame()
-logDate = '2020-10-28'
+logDate = '2020-05-08'
 query = """
-select * from "Connection" where cast("DATETIME" as date) = %s
+select * from "Connection" where "DATETIME"::date = %s
 """
 
 cur = conn.cursor()
@@ -39,8 +43,6 @@ df = pd.DataFrame(data = rows, columns = columns)
 # cur.close()
 # conn.close()
 
-# %%
-# --- connect to db and pull data into "df"
 
 # %%
 # --- All the available users from the log:
@@ -225,7 +227,7 @@ user_traffic_per_host  = pd.DataFrame({
     ))
 })
 
-user_traffic_per_host    .sort_values(by="{0}.Total".format(size_unit), ascending=True)    .tail(10).set_index("DestinationHost")    .plot(kind="barh")
+user_traffic_per_host.sort_values(by="{0}.Total".format(size_unit), ascending=True).tail(10).set_index("DestinationHost").plot(kind="barh")
     
 plt.show()
 
@@ -234,12 +236,13 @@ plt.show()
 
 # %%
 # unique DestinationIp adresses:
-pd.DataFrame(user_traffic.DestinationIp.unique(), columns=["DestinationIp"]).query('`DestinationIp`.str.contains("209.")') # .head(5)
+pd.DataFrame({"DestinationIp": user_traffic.query('`DestinationIp`.str.contains("209.")').DestinationIp.unique()})
 
 
 # %%
 # unique DestinationHost adresses:
-pd.DataFrame(user_traffic.DestinationHost.unique(), columns=["DestinationHost"]).query('`DestinationHost`.str.contains("aaplimg.com")') # .head(5)
+user_traffic.DestinationHost.fillna(value="", inplace=True)
+pd.DataFrame({"DestinationHost": user_traffic.query('`DestinationHost`.str.contains("google.com")').DestinationHost.unique()})
 
 #%% [markdown]
 # ## User-traffic by Hour as Bar-Chart:

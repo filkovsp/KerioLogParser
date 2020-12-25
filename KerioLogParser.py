@@ -25,6 +25,7 @@ dsn = """
     password = postgres
     port = 5432
 """
+# Alternative way to connect:
 # conn = psycopg2.connect(
 #     host = "192.168.1.10",
 #     database = "kerio",
@@ -40,7 +41,7 @@ files = [f for f in os.listdir('./logs')
          if re.match(r'\Aconnection\.[\d{4}\-d{2}\-\d{2}].*\.log', f)]
 
 # %% --- get only one file name:
-# files = ["connection.2020-10-01 - 235956.log"]
+files = ["connection.test.log"]
 
 
 # %% --- process all files and upload into db
@@ -49,7 +50,7 @@ for x in files:
     df = pd.DataFrame()
     start_time = dt.datetime.now()
     
-    print("{0} starting with the file {1}".format(
+    print("{0} starting with {1}".format(
         TimeUtil.getDTString(t=start_time), filePath))
     
     with open(file = filePath, mode = "r", buffering = 1_000_000) as f:
@@ -60,16 +61,16 @@ for x in files:
     # --- Set DataFrame.index to the unique "ID" field:
     # df.set_index("ID", inplace=True)
     # --- Replace noname user name with "NaN" value:
-    df["User"].mask(df["User"] == "", "NaN", inplace=True)
+    # df["User"].mask(df["User"] == "", "NaN", inplace=True)
 
     # --- Replace empty DestinationHostName with their DestinationIp.
     # in some cases it looks like Kerio bug, 
     # where, for a bunch of lines with the same Destination IP
     # there is just missing Destination HostName.
     # Possibly more sophisticated replacement is required here...
-    df["DestinationHost"].mask(
-        df["DestinationHost"] == "", 
-        df["DestinationIp"], inplace=True)
+    # df["DestinationHost"].mask(
+    #     df["DestinationHost"] == "", 
+    #     df["DestinationIp"], inplace=True)
 
     # --- finally, count the processing time and show it as formatted string:
     print("{0}{1:<5}it took {2} to read {3} lines".format(
@@ -87,7 +88,8 @@ for x in files:
             .format(",".join(["%s" for _ in list(df.columns)]))
 
         # --- create INSERT INTO table (columns) VALUES('%s',...)
-        insert_stmt = "INSERT INTO {} ({}) {}".format('public."Connection"', columns, values)
+        insert_stmt = "INSERT INTO {} ({}) {} on conflict do nothing" \
+            .format('public."Connection"', columns, values)
         
         start_time = dt.datetime.now()
         print("{0}{1:<5}uploading data to db".format(
@@ -108,6 +110,7 @@ for x in files:
                 TimeUtil.getDTString(), " ",
                 TimeUtil.getDuration(t=start_time)
             ))
+print("All done!")
 
 # %% --- read from db:
 """
@@ -115,30 +118,9 @@ for x in files:
     cur.execute('select * from "Connection" limit 5')
     rows = cur.fetchall()
     columns = list(map(lambda x: x[0], cur.description))
-    dl = pd.DataFrame(data = rows, columns = columns)
+    df = pd.DataFrame(data = rows, columns = columns)
     cur.close()
     conn.close()
-"""
-
-# %% --- Compare 2 datasets in Python:
-"""
-    # get some other DataFrame with identical list of columns:
-    dl = ......
-    
-    # merge them: 
-    m = df.merge(dl, on=['ID', 'DATETIME'], how='outer', suffixes=['', '_'], indicator=True)
-    
-    # if in case only few columns need to be looked at:
-    # m = df[["ID", "DATETIME"]].merge(dl[["ID", "DATETIME"]], on=['ID', 'DATETIME'], how='outer', suffixes=['', '_'], indicator=True)
-    
-    # delete records that are present in both DataFrames:
-    m = m.query("`_merge` != 'both'")
-    
-    # optional, in case if "_merge" if the same for all records, like "left_only", for example...:
-    m.drop(labels=["_merge"], axis="columns", inplace = True)
-    
-    # clean up columns if necessary:
-    m = m.loc[:,~m.columns.str.endswith('_')]
 """
 
 # %% --- close connection:
