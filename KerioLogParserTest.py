@@ -1,6 +1,6 @@
 from __future__ import absolute_import, print_function, annotations
-from include.Connection import Connection
-from include.Tools import *
+from kerio.Connection import Connection
+from kerio.Tools import *
 import pandas as pd
 
 

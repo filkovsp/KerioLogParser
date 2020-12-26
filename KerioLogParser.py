@@ -8,8 +8,8 @@
 # import matplotlib.pyplot as plt
 
 # %% --- main imports:
-from include.Connection import Connection
-from include.Tools import *
+from kerio.Connection import Connection
+from kerio.Tools import *
 import pandas as pd
 import numpy as np
 import datetime as dt

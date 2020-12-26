@@ -1,7 +1,7 @@
 # %%
 import pykerio # https://pypi.org/project/PyKerio/
 import ssl
-from include.Connection import Connection
+from kerio.Connection import Connection
 import pandas as pd
 import time
 
